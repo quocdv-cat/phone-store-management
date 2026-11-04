@@ -46,3 +46,6 @@ https://github.com/quocdv/PhoneStoreManagement.git follow it and install it into
 - **Quản trị viên (Full quyền):** `admin` / `123456`
 - **Nhân viên bán hàng:** `nhanvien1` / `123456`
 - **Nhân viên kho:** `nhanvien2` / `123456`
+=======
+# phone-store-mangae
+Demo học phần Lập trình Java - Phần mềm quản lý của hàng điện thoại di động
