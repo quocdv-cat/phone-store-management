@@ -72,14 +72,14 @@ public class MainFrame extends JFrame {
         JPanel menuPanel = new JPanel(new GridLayout(8, 1, 0, 10));
         menuPanel.setOpaque(false);
 
-        JButton btnProducts = createMenuButton("1. Quản lý Điện thoại (TV1)");
-        JButton btnSales = createMenuButton("2. Bán hàng POS (TV2)");
-        JButton btnInvoices = createMenuButton("3. Quản lý Hóa đơn (TV2)");
-        JButton btnCustomers = createMenuButton("4. Quản lý Khách hàng (TV2)");
-        JButton btnPurchase = createMenuButton("5. Quản lý Nhập kho (TV3)");
-        JButton btnSuppliers = createMenuButton("6. Nhà cung cấp (TV3)");
-        JButton btnEmployees = createMenuButton("7. Quản lý Nhân viên (TV1)");
-        JButton btnStatistics = createMenuButton("8. Thống kê Doanh thu (TV3)");
+        JButton btnProducts = createMenuButton("1. Quản lý Điện thoại");
+        JButton btnSales = createMenuButton("2. Bán hàng POS");
+        JButton btnInvoices = createMenuButton("3. Quản lý Hóa đơn");
+        JButton btnCustomers = createMenuButton("4. Quản lý Khách hàng");
+        JButton btnPurchase = createMenuButton("5. Quản lý Nhập kho");
+        JButton btnSuppliers = createMenuButton("6. Nhà cung cấp");
+        JButton btnEmployees = createMenuButton("7. Quản lý Nhân viên");
+        JButton btnStatistics = createMenuButton("8. Thống kê Doanh thu");
 
         // Phân quyền hiển thị theo Role
         if (!SessionManager.isAdmin()) {
@@ -153,7 +153,7 @@ public class MainFrame extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JPanel topBar = new JPanel(new BorderLayout(10, 0));
-        JLabel lblHeader = new JLabel("DANH SÁCH ĐIỆN THOẠI TRONG KHO (Dữ liệu trực tiếp từ MySQL 8.4)");
+        JLabel lblHeader = new JLabel("DANH SÁCH ĐIỆN THOẠI TRONG KHO");
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
         topBar.add(lblHeader, BorderLayout.WEST);
 
