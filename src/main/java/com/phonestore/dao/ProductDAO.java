@@ -12,29 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO quản lý truy xuất bảng products và hỗ trợ Transaction cập nhật tồn kho
+ * DAO quản lý đầy đủ CRUD bảng products và hỗ trợ Transaction cập nhật tồn kho
  * dùng chung cho cả 3 thành viên.
  */
 public class ProductDAO {
 
     public List<Product> findAllActive() {
-        return searchProducts("", null, null, false);
+        return searchProducts("", null, null, false, "ACTIVE");
     }
 
     public List<Product> searchProducts(String keyword, Integer brandId, Integer categoryId, boolean onlyInStock) {
+        return searchProducts(keyword, brandId, categoryId, onlyInStock, "ACTIVE");
+    }
+
+    public List<Product> searchProducts(String keyword, Integer brandId, Integer categoryId, boolean onlyInStock, String statusFilter) {
         List<Product> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT p.*, b.brand_name, c.category_name "
                 + "FROM products p "
                 + "JOIN brands b ON p.brand_id = b.brand_id "
                 + "JOIN categories c ON p.category_id = c.category_id "
-                + "WHERE p.status = 'ACTIVE' "
+                + "WHERE 1=1 "
         );
 
         List<Object> params = new ArrayList<>();
+        if (statusFilter != null && !statusFilter.trim().isEmpty() && !"ALL".equalsIgnoreCase(statusFilter)) {
+            sql.append("AND p.status = ? ");
+            params.add(statusFilter.trim().toUpperCase());
+        }
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (p.product_code LIKE ? OR p.product_name LIKE ? OR p.model LIKE ?) ");
+            sql.append("AND (p.product_code LIKE ? OR p.product_name LIKE ? OR p.model LIKE ? OR b.brand_name LIKE ?) ");
             String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
             params.add(kw);
             params.add(kw);
             params.add(kw);
@@ -66,6 +75,159 @@ public class ProductDAO {
             ex.printStackTrace();
         }
         return list;
+    }
+
+    public Product findById(int productId) {
+        String sql = "SELECT p.*, b.brand_name, c.category_name "
+                + "FROM products p "
+                + "JOIN brands b ON p.brand_id = b.brand_id "
+                + "JOIN categories c ON p.category_id = c.category_id "
+                + "WHERE p.product_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public Product findByCode(String productCode) {
+        String sql = "SELECT p.*, b.brand_name, c.category_name "
+                + "FROM products p "
+                + "JOIN brands b ON p.brand_id = b.brand_id "
+                + "JOIN categories c ON p.category_id = c.category_id "
+                + "WHERE LOWER(p.product_code) = LOWER(?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, productCode.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean existsByCode(String productCode, int excludeProductId) {
+        String sql = "SELECT COUNT(*) FROM products WHERE LOWER(product_code) = LOWER(?) AND product_id <> ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, productCode.trim());
+            ps.setInt(2, excludeProductId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean insert(Product p) {
+        String sql = "INSERT INTO products (product_code, product_name, brand_id, category_id, model, "
+                + "ram, rom, color, import_price, selling_price, stock_quantity, warranty_months, status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getProductCode().trim());
+            ps.setString(2, p.getProductName().trim());
+            ps.setInt(3, p.getBrandId());
+            ps.setInt(4, p.getCategoryId());
+            ps.setString(5, p.getModel() == null ? "" : p.getModel().trim());
+            ps.setString(6, p.getRam().trim());
+            ps.setString(7, p.getRom().trim());
+            ps.setString(8, p.getColor().trim());
+            ps.setBigDecimal(9, p.getImportPrice() == null ? BigDecimal.ZERO : p.getImportPrice());
+            ps.setBigDecimal(10, p.getSellingPrice());
+            ps.setInt(11, p.getStockQuantity());
+            ps.setInt(12, p.getWarrantyMonths());
+            ps.setString(13, p.getStatus() == null ? "ACTIVE" : p.getStatus());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean update(Product p) {
+        String sql = "UPDATE products SET product_code = ?, product_name = ?, brand_id = ?, category_id = ?, "
+                + "model = ?, ram = ?, rom = ?, color = ?, selling_price = ?, "
+                + "stock_quantity = ?, warranty_months = ?, status = ? "
+                + "WHERE product_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getProductCode().trim());
+            ps.setString(2, p.getProductName().trim());
+            ps.setInt(3, p.getBrandId());
+            ps.setInt(4, p.getCategoryId());
+            ps.setString(5, p.getModel() == null ? "" : p.getModel().trim());
+            ps.setString(6, p.getRam().trim());
+            ps.setString(7, p.getRom().trim());
+            ps.setString(8, p.getColor().trim());
+            ps.setBigDecimal(9, p.getSellingPrice());
+            ps.setInt(10, p.getStockQuantity());
+            ps.setInt(11, p.getWarrantyMonths());
+            ps.setString(12, p.getStatus() == null ? "ACTIVE" : p.getStatus());
+            ps.setInt(13, p.getProductId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean hasTransactions(int productId) {
+        String sql = "SELECT "
+                + "(SELECT COUNT(*) FROM invoice_details WHERE product_id = ?) + "
+                + "(SELECT COUNT(*) FROM purchase_details WHERE product_id = ?) AS total_refs";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setInt(2, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total_refs") > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean softDelete(int productId) {
+        String sql = "UPDATE products SET status = 'INACTIVE' WHERE product_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deletePhysical(int productId) {
+        String sql = "DELETE FROM products WHERE product_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     /**

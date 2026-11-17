@@ -1,7 +1,11 @@
 package com.phonestore.view;
 
+import com.phonestore.model.Employee;
+import com.phonestore.model.User;
 import com.phonestore.service.AuthService;
 import com.phonestore.utils.MessageUtils;
+import com.phonestore.utils.SessionManager;
+import com.phonestore.utils.ValidationUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,7 +36,7 @@ public class LoginFrame extends JFrame {
     private void initComponents() {
         setTitle("Đăng nhập - Quản lý Cửa hàng Điện thoại Di động");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(460, 340);
+        setSize(480, 350);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -60,7 +64,7 @@ public class LoginFrame extends JFrame {
 
         gbc.gridx = 1;
         gbc.weightx = 0.7;
-        txtUsername = new JTextField("admin");
+        txtUsername = new JTextField();
         txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtUsername.setPreferredSize(new Dimension(220, 34));
         formPanel.add(txtUsername, gbc);
@@ -74,7 +78,7 @@ public class LoginFrame extends JFrame {
 
         gbc.gridx = 1;
         gbc.weightx = 0.7;
-        txtPassword = new JPasswordField("123456");
+        txtPassword = new JPasswordField();
         txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtPassword.setPreferredSize(new Dimension(220, 34));
         formPanel.add(txtPassword, gbc);
@@ -82,10 +86,6 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
-        JLabel lblHint = new JLabel("Mẫu thử: admin / 123456 hoặc nhanvien1 / 123456", SwingConstants.CENTER);
-        lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        lblHint.setForeground(Color.GRAY);
-        formPanel.add(lblHint, gbc);
 
         rootPanel.add(formPanel, BorderLayout.CENTER);
 
@@ -112,8 +112,20 @@ public class LoginFrame extends JFrame {
             return;
         }
 
+        Employee emp = SessionManager.getCurrentEmployee();
+        User user = SessionManager.getCurrentUser();
+        String chucVu = (emp != null && !ValidationUtils.isEmpty(emp.getPosition()))
+                ? emp.getPosition()
+                : (user != null ? user.getRole() : "");
+        String hoTen = (emp != null && !ValidationUtils.isEmpty(emp.getFullName()))
+                ? emp.getFullName()
+                : (user != null ? user.getUsername() : "");
+
         MainFrame mainFrame = new MainFrame();
         mainFrame.setVisible(true);
         dispose();
+
+        // Hiện cửa sổ nhỏ thông báo chào mừng đúng định dạng: Chào mừng [CHỨC VỤ] [HỌ TÊN]
+        MessageUtils.showInfo(mainFrame, "Chào mừng " + chucVu + " " + hoTen);
     }
 }

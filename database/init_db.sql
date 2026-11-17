@@ -146,6 +146,28 @@ CREATE TABLE invoice_details (
     CONSTRAINT fk_id_product FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+-- 12. Bảng position_permissions (Phân quyền truy cập module theo từng Chức vụ)
+CREATE TABLE position_permissions (
+    position_name VARCHAR(100) PRIMARY KEY,
+    can_products TINYINT(1) NOT NULL DEFAULT 1,
+    can_cat_brand TINYINT(1) NOT NULL DEFAULT 1,
+    can_sales TINYINT(1) NOT NULL DEFAULT 1,
+    can_invoices TINYINT(1) NOT NULL DEFAULT 1,
+    can_customers TINYINT(1) NOT NULL DEFAULT 1,
+    can_purchase TINYINT(1) NOT NULL DEFAULT 1,
+    can_suppliers TINYINT(1) NOT NULL DEFAULT 1,
+    can_employees TINYINT(1) NOT NULL DEFAULT 0,
+    can_statistics TINYINT(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+
+INSERT INTO position_permissions
+(position_name, can_products, can_cat_brand, can_sales, can_invoices, can_customers, can_purchase, can_suppliers, can_employees, can_statistics) VALUES
+('Cửa hàng trưởng', 1, 1, 1, 1, 1, 1, 1, 1, 1),
+('Nhân viên bán hàng', 1, 0, 1, 1, 1, 0, 0, 0, 0),
+('Nhân viên kho', 1, 1, 0, 0, 0, 1, 1, 0, 0),
+('Kế toán', 1, 0, 0, 1, 1, 1, 1, 0, 1),
+('Kỹ thuật viên', 1, 1, 0, 1, 1, 0, 0, 0, 0);
+
 -- ============================================================================
 -- DỮ LIỆU MẪU (SAMPLE DATA)
 -- ============================================================================
@@ -155,10 +177,12 @@ INSERT INTO employees (employee_code, full_name, phone, email, address, position
 ('NV002', 'Trần Thị Bán Hàng', '0901000002', 'staff1@phonestore.vn', 'Quận 3, TP.HCM', 'Nhân viên bán hàng', 'ACTIVE'),
 ('NV003', 'Lê Văn Thủ Kho', '0901000003', 'staff2@phonestore.vn', 'Quận Bình Thạnh, TP.HCM', 'Nhân viên kho', 'ACTIVE');
 
+-- Mật khẩu được mã hóa SHA-256 (không lưu plain-text):
+-- admin: Admin@123 | nhanvien1: Staff@123 | nhanvien2: Staff@123
 INSERT INTO users (employee_id, username, password_hash, role, status) VALUES
-(1, 'admin', '123456', 'ADMIN', 'ACTIVE'),
-(2, 'nhanvien1', '123456', 'STAFF', 'ACTIVE'),
-(3, 'nhanvien2', '123456', 'STAFF', 'ACTIVE');
+(1, 'admin', SHA2('Admin@123', 256), 'ADMIN', 'ACTIVE'),
+(2, 'nhanvien1', SHA2('Staff@123', 256), 'STAFF', 'ACTIVE'),
+(3, 'nhanvien2', SHA2('Staff@123', 256), 'STAFF', 'ACTIVE');
 
 INSERT INTO brands (brand_name, origin_country, description) VALUES
 ('Apple', 'Mỹ', 'Dòng điện thoại iPhone chính hãng VN/A'),
