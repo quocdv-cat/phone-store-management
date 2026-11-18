@@ -37,6 +37,9 @@ public class MainFrame extends JFrame {
     private final ProductDAO productDAO = new ProductDAO();
     private DefaultTableModel productTableModel;
     private JTextField txtSearchProduct;
+    private SupplierPanel supplierPanel;
+    private PurchasePanel purchasePanel;
+    private StatisticsPanel statisticsPanel;
 
     public MainFrame() {
         initComponents();
@@ -111,15 +114,19 @@ public class MainFrame extends JFrame {
         });
         sidebar.add(btnLogout, BorderLayout.SOUTH);
 
+        supplierPanel = new SupplierPanel();
+        purchasePanel = new PurchasePanel();
+        statisticsPanel = new StatisticsPanel();
+
         // 2. CONTENT PANEL (CardLayout cho 3 thành viên gắn JPanel vào)
         contentPanel.add(createProductOverviewPanel(), "PRODUCTS");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ BÁN HÀNG POS - THÀNH VIÊN 2 (SalesPanel)"), "SALES");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ LỊCH SỬ HÓA ĐƠN - THÀNH VIÊN 2 (InvoicePanel)"), "INVOICES");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ KHÁCH HÀNG - THÀNH VIÊN 2 (CustomerPanel)"), "CUSTOMERS");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHẬP HÀNG - THÀNH VIÊN 3 (PurchasePanel)"), "PURCHASE");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ NHÀ CUNG CẤP - THÀNH VIÊN 3 (SupplierPanel)"), "SUPPLIERS");
+        contentPanel.add(purchasePanel, "PURCHASE");
+        contentPanel.add(supplierPanel, "SUPPLIERS");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN - THÀNH VIÊN 1 (EmployeePanel)"), "EMPLOYEES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ THỐNG KÊ & BÁO CÁO - THÀNH VIÊN 3 (StatisticsPanel)"), "STATISTICS");
+        contentPanel.add(statisticsPanel, "STATISTICS");
 
         btnProducts.addActionListener(e -> {
             loadProducts(txtSearchProduct.getText());
@@ -128,10 +135,19 @@ public class MainFrame extends JFrame {
         btnSales.addActionListener(e -> cardLayout.show(contentPanel, "SALES"));
         btnInvoices.addActionListener(e -> cardLayout.show(contentPanel, "INVOICES"));
         btnCustomers.addActionListener(e -> cardLayout.show(contentPanel, "CUSTOMERS"));
-        btnPurchase.addActionListener(e -> cardLayout.show(contentPanel, "PURCHASE"));
-        btnSuppliers.addActionListener(e -> cardLayout.show(contentPanel, "SUPPLIERS"));
+        btnPurchase.addActionListener(e -> {
+            purchasePanel.reloadSuppliersAndProducts();
+            cardLayout.show(contentPanel, "PURCHASE");
+        });
+        btnSuppliers.addActionListener(e -> {
+            supplierPanel.loadData("");
+            cardLayout.show(contentPanel, "SUPPLIERS");
+        });
         btnEmployees.addActionListener(e -> cardLayout.show(contentPanel, "EMPLOYEES"));
-        btnStatistics.addActionListener(e -> cardLayout.show(contentPanel, "STATISTICS"));
+        btnStatistics.addActionListener(e -> {
+            statisticsPanel.loadAllData();
+            cardLayout.show(contentPanel, "STATISTICS");
+        });
 
         root.add(sidebar, BorderLayout.WEST);
         root.add(contentPanel, BorderLayout.CENTER);
