@@ -23,7 +23,8 @@ import javax.swing.SwingConstants;
 
 /**
  * Cửa sổ Trang chủ sử dụng Sidebar có Icon trực quan + CardLayout.
- * Tự động áp dụng phân quyền theo từng Chức vụ của nhân viên đăng nhập.
+ * Tích hợp đầy đủ các module của Thành viên 1 (Sản phẩm, Thương hiệu & Danh mục, Nhân viên & Tài khoản)
+ * và Thành viên 3 (Nhập kho, Nhà cung cấp, Thống kê Doanh thu).
  */
 public class MainFrame extends JFrame {
 
@@ -31,9 +32,15 @@ public class MainFrame extends JFrame {
     private final JPanel contentPanel = new JPanel(cardLayout);
     private final PositionPermissionDAO permissionDAO = new PositionPermissionDAO();
 
+    // Các Panel của Thành viên 1
     private ProductPanel productPanel;
     private CategoryBrandPanel categoryBrandPanel;
     private EmployeePanel employeePanel;
+
+    // Các Panel của Thành viên 3
+    private PurchasePanel purchasePanel;
+    private SupplierPanel supplierPanel;
+    private StatisticsPanel statisticsPanel;
 
     private JButton btnProducts;
     private JButton btnCatBrand;
@@ -58,7 +65,7 @@ public class MainFrame extends JFrame {
 
         JPanel root = new JPanel(new BorderLayout());
 
-        // 1. SIDEBAR MENU VỚI ICON TRỰC QUAN (Thay cho số thứ tự 1, 2, 3...)
+        // 1. SIDEBAR MENU VỚI ICON TRỰC QUAN
         JPanel sidebar = new JPanel(new BorderLayout(0, 12));
         sidebar.setPreferredSize(new Dimension(255, 0));
         sidebar.setBackground(new Color(30, 41, 59));
@@ -132,20 +139,24 @@ public class MainFrame extends JFrame {
         bottomAccountPanel.add(btnLogout);
         sidebar.add(bottomAccountPanel, BorderLayout.SOUTH);
 
-        // 2. CONTENT PANEL (CardLayout)
+        // 2. CONTENT PANEL (CardLayout tích hợp TV1 & TV3)
         productPanel = new ProductPanel();
         categoryBrandPanel = new CategoryBrandPanel(() -> productPanel.refreshData());
         employeePanel = new EmployeePanel(this::applyPositionPermissions);
+
+        purchasePanel = new PurchasePanel();
+        supplierPanel = new SupplierPanel();
+        statisticsPanel = new StatisticsPanel();
 
         contentPanel.add(productPanel, "PRODUCTS");
         contentPanel.add(categoryBrandPanel, "CAT_BRAND");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ BÁN HÀNG"), "SALES");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ HÓA ĐƠN"), "INVOICES");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ KHÁCH HÀNG"), "CUSTOMERS");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHẬP KHO"), "PURCHASE");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHÀ CUNG CẤP"), "SUPPLIERS");
+        contentPanel.add(purchasePanel, "PURCHASE");
+        contentPanel.add(supplierPanel, "SUPPLIERS");
         contentPanel.add(employeePanel, "EMPLOYEES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ THỐNG KÊ & BÁO CÁO DOANH THU"), "STATISTICS");
+        contentPanel.add(statisticsPanel, "STATISTICS");
 
         btnProducts.addActionListener(e -> {
             productPanel.refreshData();
@@ -158,13 +169,22 @@ public class MainFrame extends JFrame {
         btnSales.addActionListener(e -> cardLayout.show(contentPanel, "SALES"));
         btnInvoices.addActionListener(e -> cardLayout.show(contentPanel, "INVOICES"));
         btnCustomers.addActionListener(e -> cardLayout.show(contentPanel, "CUSTOMERS"));
-        btnPurchase.addActionListener(e -> cardLayout.show(contentPanel, "PURCHASE"));
-        btnSuppliers.addActionListener(e -> cardLayout.show(contentPanel, "SUPPLIERS"));
+        btnPurchase.addActionListener(e -> {
+            purchasePanel.reloadSuppliersAndProducts();
+            cardLayout.show(contentPanel, "PURCHASE");
+        });
+        btnSuppliers.addActionListener(e -> {
+            supplierPanel.loadData("");
+            cardLayout.show(contentPanel, "SUPPLIERS");
+        });
         btnEmployees.addActionListener(e -> {
             employeePanel.refreshData();
             cardLayout.show(contentPanel, "EMPLOYEES");
         });
-        btnStatistics.addActionListener(e -> cardLayout.show(contentPanel, "STATISTICS"));
+        btnStatistics.addActionListener(e -> {
+            statisticsPanel.loadAllData();
+            cardLayout.show(contentPanel, "STATISTICS");
+        });
 
         root.add(sidebar, BorderLayout.WEST);
         root.add(contentPanel, BorderLayout.CENTER);
@@ -176,7 +196,6 @@ public class MainFrame extends JFrame {
      */
     public final void applyPositionPermissions() {
         if (SessionManager.isAdmin()) {
-            // Tài khoản ADMIN luôn đảm bảo quyền truy cập mục Nhân viên & Tài khoản để cấu hình
             btnEmployees.setEnabled(true);
         }
         Employee emp = SessionManager.getCurrentEmployee();
