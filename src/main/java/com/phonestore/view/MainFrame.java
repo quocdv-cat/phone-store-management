@@ -28,13 +28,19 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Cửa sổ chính sử dụng Sidebar + CardLayout.
- * Là khung tích hợp chung cho cả 3 thành viên.
+ * Khung tích hợp liên thông cả 3 thành viên trong nhóm.
  */
 public class MainFrame extends JFrame {
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(cardLayout);
     private final ProductDAO productDAO = new ProductDAO();
+
+    // Phân hệ Thành viên 2 (TV2)
+    private SalesPanel salesPanel;
+    private InvoicePanel invoicePanel;
+    private CustomerPanel customerPanel;
+
     private DefaultTableModel productTableModel;
     private JTextField txtSearchProduct;
 
@@ -46,7 +52,7 @@ public class MainFrame extends JFrame {
     private void initComponents() {
         setTitle("Phần mềm Quản lý Cửa hàng Điện thoại Di động - Mobile Store Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1240, 740);
+        setSize(1280, 760);
         setLocationRelativeTo(null);
 
         JPanel root = new JPanel(new BorderLayout());
@@ -59,8 +65,8 @@ public class MainFrame extends JFrame {
 
         User user = SessionManager.getCurrentUser();
         Employee emp = SessionManager.getCurrentEmployee();
-        String displayName = emp != null ? emp.getFullName() : (user != null ? user.getUsername() : "User");
-        String role = user != null ? user.getRole() : "STAFF";
+        String displayName = emp != null ? emp.getFullName() : (user != null ? user.getUsername() : "Quản trị viên");
+        String role = user != null ? user.getRole() : "ADMIN";
 
         JLabel lblBrand = new JLabel("<html><center>MOBILE STORE<br><font size='3' color='#94a3b8'>"
                 + displayName + " (" + role + ")</font></center></html>", SwingConstants.CENTER);
@@ -112,10 +118,14 @@ public class MainFrame extends JFrame {
         sidebar.add(btnLogout, BorderLayout.SOUTH);
 
         // 2. CONTENT PANEL (CardLayout cho 3 thành viên gắn JPanel vào)
+        salesPanel = new SalesPanel();
+        invoicePanel = new InvoicePanel();
+        customerPanel = new CustomerPanel();
+
         contentPanel.add(createProductOverviewPanel(), "PRODUCTS");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ BÁN HÀNG POS - THÀNH VIÊN 2 (SalesPanel)"), "SALES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ LỊCH SỬ HÓA ĐƠN - THÀNH VIÊN 2 (InvoicePanel)"), "INVOICES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ KHÁCH HÀNG - THÀNH VIÊN 2 (CustomerPanel)"), "CUSTOMERS");
+        contentPanel.add(salesPanel, "SALES");
+        contentPanel.add(invoicePanel, "INVOICES");
+        contentPanel.add(customerPanel, "CUSTOMERS");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHẬP HÀNG - THÀNH VIÊN 3 (PurchasePanel)"), "PURCHASE");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ NHÀ CUNG CẤP - THÀNH VIÊN 3 (SupplierPanel)"), "SUPPLIERS");
         contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN - THÀNH VIÊN 1 (EmployeePanel)"), "EMPLOYEES");
@@ -125,9 +135,18 @@ public class MainFrame extends JFrame {
             loadProducts(txtSearchProduct.getText());
             cardLayout.show(contentPanel, "PRODUCTS");
         });
-        btnSales.addActionListener(e -> cardLayout.show(contentPanel, "SALES"));
-        btnInvoices.addActionListener(e -> cardLayout.show(contentPanel, "INVOICES"));
-        btnCustomers.addActionListener(e -> cardLayout.show(contentPanel, "CUSTOMERS"));
+        btnSales.addActionListener(e -> {
+            salesPanel.loadAvailableProducts("");
+            cardLayout.show(contentPanel, "SALES");
+        });
+        btnInvoices.addActionListener(e -> {
+            invoicePanel.loadInvoices();
+            cardLayout.show(contentPanel, "INVOICES");
+        });
+        btnCustomers.addActionListener(e -> {
+            customerPanel.loadCustomers("");
+            cardLayout.show(contentPanel, "CUSTOMERS");
+        });
         btnPurchase.addActionListener(e -> cardLayout.show(contentPanel, "PURCHASE"));
         btnSuppliers.addActionListener(e -> cardLayout.show(contentPanel, "SUPPLIERS"));
         btnEmployees.addActionListener(e -> cardLayout.show(contentPanel, "EMPLOYEES"));

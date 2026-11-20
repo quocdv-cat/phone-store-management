@@ -147,7 +147,8 @@ Start-Service -Name "MySQL84"
 1. Import the 11 tables and sample data from `<TARGET_DIR>\database\init_db.sql` into `mobile_store_db`:
    ```powershell
    $mysqlExe = "C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe"
-   cmd /c "`"$mysqlExe`" -u root --default-character-set=utf8mb4 < `"<TARGET_DIR>\database\init_db.sql`""
+   $sqlPath = "<TARGET_DIR>/database/init_db.sql".Replace("\", "/")
+   & $mysqlExe -u root --default-character-set=utf8mb4 -e "source $sqlPath"
    & $mysqlExe -u root --default-character-set=utf8mb4 -D mobile_store_db -e "SHOW TABLES;"
    ```
 2. Run Maven build inside `<TARGET_DIR>` to download dependencies (`mysql-connector-j`, `flatlaf`) and verify compilation:

@@ -9,6 +9,7 @@ public class Invoice {
     private String invoiceCode;
     private int customerId;
     private String customerName;
+    private String customerPhone;
     private int employeeId;
     private String employeeName;
     private LocalDateTime invoiceDate;
@@ -51,6 +52,14 @@ public class Invoice {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
     }
 
     public int getEmployeeId() {

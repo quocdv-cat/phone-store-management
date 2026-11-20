@@ -10,8 +10,16 @@ public class Customer {
     private String email;
     private String address;
     private LocalDateTime createdAt;
+    private int totalOrders;
 
     public Customer() {
+    }
+
+    public Customer(String fullName, String phone, String email, String address) {
+        this.fullName = fullName;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
     }
 
     public Customer(int customerId, String fullName, String phone, String email, String address) {
@@ -68,6 +76,14 @@ public class Customer {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getTotalOrders() {
+        return totalOrders;
+    }
+
+    public void setTotalOrders(int totalOrders) {
+        this.totalOrders = totalOrders;
     }
 
     @Override
