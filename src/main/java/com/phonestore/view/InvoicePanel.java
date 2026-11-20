@@ -3,6 +3,7 @@ package com.phonestore.view;
 import com.phonestore.model.Invoice;
 import com.phonestore.model.InvoiceDetail;
 import com.phonestore.service.InvoiceService;
+import com.phonestore.utils.CsvExportUtils;
 import com.phonestore.utils.CurrencyUtils;
 import com.phonestore.utils.DateUtils;
 import com.phonestore.utils.MessageUtils;
@@ -10,6 +11,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -83,7 +87,7 @@ public class InvoicePanel extends JPanel {
         JPanel topContainer = new JPanel(new BorderLayout(0, 10));
 
         JPanel headerRow = new JPanel(new BorderLayout());
-        JLabel lblHeader = new JLabel("QUẢN LÝ LỊCH SỬ HÓA ĐƠN BÁN HÀNG (INVOICES MANAGEMENT)");
+        JLabel lblHeader = new JLabel("QUẢN LÝ LỊCH SỬ HÓA ĐƠN BÁN HÀNG");
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblHeader.setForeground(new Color(30, 41, 59));
 
@@ -95,11 +99,14 @@ public class InvoicePanel extends JPanel {
         headerRow.add(lblSubHeader, BorderLayout.SOUTH);
         topContainer.add(headerRow, BorderLayout.NORTH);
 
-        // Filter Bar
-        JPanel filterBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        filterBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)));
+        // Filter Bar (2 dòng co giãn với GridBagLayout để không bao giờ bị che nút khi thu nhỏ cửa sổ)
+        JPanel filterBar = new JPanel(new GridBagLayout());
+        filterBar.setBorder(BorderFactory.createTitledBorder("Tìm kiếm & Lọc hóa đơn"));
+        GridBagConstraints fgbc = new GridBagConstraints();
+        fgbc.insets = new Insets(4, 6, 4, 6);
+        fgbc.fill = GridBagConstraints.HORIZONTAL;
 
-        txtSearch = new JTextField(15);
+        txtSearch = new JTextField(14);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         txtSearch.putClientProperty("JTextField.placeholderText", "Mã HĐ, Khách hàng, SĐT...");
 
@@ -135,19 +142,48 @@ public class InvoicePanel extends JPanel {
         btnPreview.setFocusPainted(false);
         btnPreview.setEnabled(false);
 
-        filterBar.add(new JLabel("Tìm kiếm:"));
-        filterBar.add(txtSearch);
-        filterBar.add(new JLabel("Mốc:"));
-        filterBar.add(cbQuickRange);
-        filterBar.add(new JLabel("Từ ngày:"));
-        filterBar.add(txtFromDate);
-        filterBar.add(new JLabel("Đến ngày:"));
-        filterBar.add(txtToDate);
-        filterBar.add(new JLabel("Trạng thái:"));
-        filterBar.add(cbStatus);
-        filterBar.add(btnSearch);
-        filterBar.add(btnReset);
-        filterBar.add(btnPreview);
+        JButton btnExportExcel = new JButton("Xuất Excel");
+        btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExportExcel.setBackground(new Color(22, 163, 74));
+        btnExportExcel.setForeground(Color.WHITE);
+        btnExportExcel.addActionListener(e -> CsvExportUtils.exportTableToCsv(this, invoiceTable, "DanhSachHoaDon"));
+
+        // Dòng 1: Tìm kiếm + Mốc thời gian + Trạng thái
+        fgbc.gridx = 0; fgbc.gridy = 0; fgbc.weightx = 0;
+        filterBar.add(new JLabel("Tìm kiếm:"), fgbc);
+        fgbc.gridx = 1; fgbc.weightx = 0.4;
+        filterBar.add(txtSearch, fgbc);
+
+        fgbc.gridx = 2; fgbc.weightx = 0;
+        filterBar.add(new JLabel("Mốc:"), fgbc);
+        fgbc.gridx = 3; fgbc.weightx = 0.3;
+        filterBar.add(cbQuickRange, fgbc);
+
+        fgbc.gridx = 4; fgbc.weightx = 0;
+        filterBar.add(new JLabel("Trạng thái:"), fgbc);
+        fgbc.gridx = 5; fgbc.weightx = 0.3;
+        filterBar.add(cbStatus, fgbc);
+
+        // Dòng 2: Từ ngày + Đến ngày + Cụm nút thao tác
+        fgbc.gridx = 0; fgbc.gridy = 1; fgbc.weightx = 0;
+        filterBar.add(new JLabel("Từ ngày:"), fgbc);
+        fgbc.gridx = 1; fgbc.weightx = 0.25;
+        filterBar.add(txtFromDate, fgbc);
+
+        fgbc.gridx = 2; fgbc.weightx = 0;
+        filterBar.add(new JLabel("Đến ngày:"), fgbc);
+        fgbc.gridx = 3; fgbc.weightx = 0.25;
+        filterBar.add(txtToDate, fgbc);
+
+        JPanel btnGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        btnGroup.setOpaque(false);
+        btnGroup.add(btnSearch);
+        btnGroup.add(btnReset);
+        btnGroup.add(btnPreview);
+        btnGroup.add(btnExportExcel);
+
+        fgbc.gridx = 4; fgbc.gridwidth = 2; fgbc.weightx = 0.5;
+        filterBar.add(btnGroup, fgbc);
 
         topContainer.add(filterBar, BorderLayout.SOUTH);
         add(topContainer, BorderLayout.NORTH);

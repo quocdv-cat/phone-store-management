@@ -59,14 +59,26 @@ public class CustomerPanel extends JPanel {
     private JLabel lblTotalSpent;
     private List<Invoice> currentHistoryList;
 
+    private JButton btnAdd;
+    private JButton btnQuickAdd;
     private JButton btnEdit;
     private JButton btnDelete;
+    private boolean editAllowed = true;
 
     public CustomerPanel() {
         this.customerService = new CustomerService();
         this.invoiceService = new InvoiceService();
         initComponents();
         loadCustomers("");
+    }
+
+    public void setEditAllowed(boolean allowed) {
+        this.editAllowed = allowed;
+        if (btnAdd != null) btnAdd.setEnabled(allowed);
+        if (btnQuickAdd != null) btnQuickAdd.setEnabled(allowed);
+        boolean hasSelection = customerTable != null && customerTable.getSelectedRow() >= 0;
+        if (btnEdit != null) btnEdit.setEnabled(allowed && hasSelection);
+        if (btnDelete != null) btnDelete.setEnabled(allowed && hasSelection);
     }
 
     private void initComponents() {
@@ -77,7 +89,7 @@ public class CustomerPanel extends JPanel {
         JPanel topContainer = new JPanel(new BorderLayout(0, 10));
 
         JPanel headerRow = new JPanel(new BorderLayout());
-        JLabel lblHeader = new JLabel("QUẢN LÝ KHÁCH HÀNG (CUSTOMER MANAGEMENT)");
+        JLabel lblHeader = new JLabel("QUẢN LÝ KHÁCH HÀNG");
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblHeader.setForeground(new Color(30, 41, 59));
 
@@ -94,13 +106,13 @@ public class CustomerPanel extends JPanel {
         toolRow.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)));
 
         JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        JButton btnAdd = new JButton("Thêm Khách Hàng");
+        btnAdd = new JButton("Thêm Khách Hàng");
         btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnAdd.setBackground(new Color(37, 99, 235));
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFocusPainted(false);
 
-        JButton btnQuickAdd = new JButton("Tạo Nhanh (POS)");
+        btnQuickAdd = new JButton("Tạo Nhanh");
         btnQuickAdd.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickAdd.setBackground(new Color(16, 185, 129));
         btnQuickAdd.setForeground(Color.WHITE);
@@ -277,8 +289,8 @@ public class CustomerPanel extends JPanel {
             if (!e.getValueIsAdjusting()) {
                 Customer selected = getSelectedCustomer();
                 boolean hasSelection = (selected != null);
-                btnEdit.setEnabled(hasSelection);
-                btnDelete.setEnabled(hasSelection);
+                btnEdit.setEnabled(editAllowed && hasSelection);
+                btnDelete.setEnabled(editAllowed && hasSelection);
                 if (hasSelection) {
                     loadCustomerHistory(selected);
                 } else {

@@ -55,10 +55,26 @@ public class CategoryBrandPanel extends JPanel {
     private JTextField txtCategoryDesc;
     private JCheckBox chkCategoryActive;
 
+    private JButton btnAddBrand;
+    private JButton btnUpdateBrand;
+    private JButton btnDeleteBrand;
+    private JButton btnAddCategory;
+    private JButton btnUpdateCategory;
+    private JButton btnDeleteCategory;
+
     public CategoryBrandPanel(Runnable onDataChanged) {
         this.onDataChanged = onDataChanged;
         initComponents();
         refreshData();
+    }
+
+    public void setEditAllowed(boolean allowed) {
+        if (btnAddBrand != null) btnAddBrand.setEnabled(allowed);
+        if (btnUpdateBrand != null) btnUpdateBrand.setEnabled(allowed);
+        if (btnDeleteBrand != null) btnDeleteBrand.setEnabled(allowed);
+        if (btnAddCategory != null) btnAddCategory.setEnabled(allowed);
+        if (btnUpdateCategory != null) btnUpdateCategory.setEnabled(allowed);
+        if (btnDeleteCategory != null) btnDeleteCategory.setEnabled(allowed);
     }
 
     public void refreshData() {
@@ -162,35 +178,35 @@ public class CategoryBrandPanel extends JPanel {
         form.add(chkBrandActive, gbc);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
-        JButton btnAdd = new JButton("Thêm mới");
-        btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnAdd.setBackground(new Color(22, 163, 74));
-        btnAdd.setForeground(Color.WHITE);
-        btnAdd.setPreferredSize(new Dimension(120, 34));
+        btnAddBrand = new JButton("Thêm mới");
+        btnAddBrand.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnAddBrand.setBackground(new Color(22, 163, 74));
+        btnAddBrand.setForeground(Color.WHITE);
+        btnAddBrand.setPreferredSize(new Dimension(120, 34));
 
-        JButton btnUpdate = new JButton("Cập nhật");
-        btnUpdate.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnUpdate.setBackground(new Color(37, 99, 235));
-        btnUpdate.setForeground(Color.WHITE);
-        btnUpdate.setPreferredSize(new Dimension(120, 34));
+        btnUpdateBrand = new JButton("Cập nhật");
+        btnUpdateBrand.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnUpdateBrand.setBackground(new Color(37, 99, 235));
+        btnUpdateBrand.setForeground(Color.WHITE);
+        btnUpdateBrand.setPreferredSize(new Dimension(120, 34));
 
-        JButton btnDelete = new JButton("Xóa");
-        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnDelete.setBackground(new Color(220, 38, 38));
-        btnDelete.setForeground(Color.WHITE);
-        btnDelete.setPreferredSize(new Dimension(100, 34));
+        btnDeleteBrand = new JButton("Xóa");
+        btnDeleteBrand.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnDeleteBrand.setBackground(new Color(220, 38, 38));
+        btnDeleteBrand.setForeground(Color.WHITE);
+        btnDeleteBrand.setPreferredSize(new Dimension(100, 34));
 
         JButton btnClear = new JButton("Làm mới");
         btnClear.setPreferredSize(new Dimension(120, 34));
 
-        btnAdd.addActionListener(e -> handleAddBrand());
-        btnUpdate.addActionListener(e -> handleUpdateBrand());
-        btnDelete.addActionListener(e -> handleDeleteBrand());
+        btnAddBrand.addActionListener(e -> handleAddBrand());
+        btnUpdateBrand.addActionListener(e -> handleUpdateBrand());
+        btnDeleteBrand.addActionListener(e -> handleDeleteBrand());
         btnClear.addActionListener(e -> clearBrandForm());
 
-        btnPanel.add(btnAdd);
-        btnPanel.add(btnUpdate);
-        btnPanel.add(btnDelete);
+        btnPanel.add(btnAddBrand);
+        btnPanel.add(btnUpdateBrand);
+        btnPanel.add(btnDeleteBrand);
         btnPanel.add(btnClear);
 
         bottomPanel.add(form, BorderLayout.CENTER);
@@ -269,35 +285,35 @@ public class CategoryBrandPanel extends JPanel {
         form.add(txtCategoryDesc, gbc);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
-        JButton btnAdd = new JButton("Thêm mới");
-        btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnAdd.setBackground(new Color(22, 163, 74));
-        btnAdd.setForeground(Color.WHITE);
-        btnAdd.setPreferredSize(new Dimension(120, 34));
+        btnAddCategory = new JButton("Thêm mới");
+        btnAddCategory.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnAddCategory.setBackground(new Color(22, 163, 74));
+        btnAddCategory.setForeground(Color.WHITE);
+        btnAddCategory.setPreferredSize(new Dimension(120, 34));
 
-        JButton btnUpdate = new JButton("Cập nhật");
-        btnUpdate.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnUpdate.setBackground(new Color(37, 99, 235));
-        btnUpdate.setForeground(Color.WHITE);
-        btnUpdate.setPreferredSize(new Dimension(120, 34));
+        btnUpdateCategory = new JButton("Cập nhật");
+        btnUpdateCategory.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnUpdateCategory.setBackground(new Color(37, 99, 235));
+        btnUpdateCategory.setForeground(Color.WHITE);
+        btnUpdateCategory.setPreferredSize(new Dimension(120, 34));
 
-        JButton btnDelete = new JButton("Xóa");
-        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnDelete.setBackground(new Color(220, 38, 38));
-        btnDelete.setForeground(Color.WHITE);
-        btnDelete.setPreferredSize(new Dimension(100, 34));
+        btnDeleteCategory = new JButton("Xóa");
+        btnDeleteCategory.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnDeleteCategory.setBackground(new Color(220, 38, 38));
+        btnDeleteCategory.setForeground(Color.WHITE);
+        btnDeleteCategory.setPreferredSize(new Dimension(100, 34));
 
         JButton btnClear = new JButton("Làm mới");
         btnClear.setPreferredSize(new Dimension(120, 34));
 
-        btnAdd.addActionListener(e -> handleAddCategory());
-        btnUpdate.addActionListener(e -> handleUpdateCategory());
-        btnDelete.addActionListener(e -> handleDeleteCategory());
+        btnAddCategory.addActionListener(e -> handleAddCategory());
+        btnUpdateCategory.addActionListener(e -> handleUpdateCategory());
+        btnDeleteCategory.addActionListener(e -> handleDeleteCategory());
         btnClear.addActionListener(e -> clearCategoryForm());
 
-        btnPanel.add(btnAdd);
-        btnPanel.add(btnUpdate);
-        btnPanel.add(btnDelete);
+        btnPanel.add(btnAddCategory);
+        btnPanel.add(btnUpdateCategory);
+        btnPanel.add(btnDeleteCategory);
         btnPanel.add(btnClear);
 
         bottomPanel.add(form, BorderLayout.CENTER);

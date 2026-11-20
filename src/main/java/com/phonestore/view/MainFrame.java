@@ -236,6 +236,21 @@ public class MainFrame extends JFrame {
         btnSuppliers.setEnabled(perm.isCanSuppliers());
         btnEmployees.setEnabled(SessionManager.isAdmin() || perm.isCanEmployees());
         btnStatistics.setEnabled(perm.isCanStatistics());
+
+        // Thực thi mức quyền chi tiết "Chỉ xem" vs "Toàn quyền" trên từng Panel
+        boolean isAdmin = SessionManager.isAdmin();
+        if (productPanel != null) {
+            productPanel.setEditAllowed(isAdmin || "Toàn quyền".equalsIgnoreCase(perm.getModeProducts()));
+        }
+        if (categoryBrandPanel != null) {
+            categoryBrandPanel.setEditAllowed(isAdmin || "Toàn quyền".equalsIgnoreCase(perm.getModeCatBrand()));
+        }
+        if (customerPanel != null) {
+            customerPanel.setEditAllowed(isAdmin || "Toàn quyền".equalsIgnoreCase(perm.getModeCustomers()));
+        }
+        if (supplierPanel != null) {
+            supplierPanel.setEditAllowed(isAdmin || "Toàn quyền".equalsIgnoreCase(perm.getModeSuppliers()));
+        }
     }
 
     private JButton createMenuButton(String text, IconType iconType) {

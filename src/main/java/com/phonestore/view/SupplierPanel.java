@@ -56,21 +56,30 @@ public class SupplierPanel extends JPanel {
         loadData("");
     }
 
+    public void setEditAllowed(boolean allowed) {
+        if (btnAdd != null) btnAdd.setEnabled(allowed);
+        if (btnUpdate != null) btnUpdate.setEnabled(allowed);
+        if (btnDelete != null) btnDelete.setEnabled(allowed);
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // 1. HEADER & THANH TÌM KIẾM
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel lblTitle = new JLabel("QUẢN LÝ NHÀ CUNG CẤP (SUPPLIERS)");
+        // 1. HEADER & THANH TÌM KIẾM (Tách 2 dòng để không đè chữ khi thu nhỏ cửa sổ)
+        JPanel headerPanel = new JPanel(new BorderLayout(0, 8));
+        JLabel lblTitle = new JLabel("QUẢN LÝ NHÀ CUNG CẤP");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(new Color(30, 41, 59));
-        headerPanel.add(lblTitle, BorderLayout.WEST);
+        headerPanel.add(lblTitle, BorderLayout.NORTH);
 
-        JPanel searchBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        txtSearch = new JTextField(18);
+        JPanel searchBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        searchBox.setBorder(BorderFactory.createTitledBorder("Tìm kiếm nhà cung cấp"));
+        txtSearch = new JTextField(22);
         txtSearch.putClientProperty("JTextField.placeholderText", "Tìm theo tên hoặc SĐT...");
         btnSearch = new JButton("Tìm kiếm");
+        btnSearch.setBackground(new Color(37, 99, 235));
+        btnSearch.setForeground(Color.WHITE);
         btnRefreshSearch = new JButton("Làm mới");
 
         btnSearch.addActionListener(e -> loadData(txtSearch.getText().trim()));
@@ -84,7 +93,7 @@ public class SupplierPanel extends JPanel {
         searchBox.add(txtSearch);
         searchBox.add(btnSearch);
         searchBox.add(btnRefreshSearch);
-        headerPanel.add(searchBox, BorderLayout.EAST);
+        headerPanel.add(searchBox, BorderLayout.CENTER);
         add(headerPanel, BorderLayout.NORTH);
 
         // 2. THÂN GIAO DIỆN: CỘT TRÁI (FORM NHẬP LIỆU) - CỘT PHẢI (BẢNG DỮ LIỆU)
@@ -165,7 +174,7 @@ public class SupplierPanel extends JPanel {
         btnAdd = new JButton("Thêm mới");
         btnUpdate = new JButton("Cập nhật");
         btnDelete = new JButton("Xóa NCC");
-        btnClear = new JButton("Xóa trắng");
+        btnClear = new JButton("Làm mới");
 
         btnAdd.setBackground(new Color(16, 185, 129));
         btnAdd.setForeground(Color.WHITE);

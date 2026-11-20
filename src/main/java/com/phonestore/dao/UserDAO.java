@@ -7,11 +7,32 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * DAO thực hiện đầy đủ CRUD cho bảng users (Tài khoản đăng nhập).
  */
 public class UserDAO {
+
+    /**
+     * Tải toàn bộ tài khoản vào Map<employee_id, User> trong 1 câu truy vấn duy nhất (Khử N+1 query).
+     */
+    public Map<Integer, User> findAllMapByEmployeeId() {
+        Map<Integer, User> map = new HashMap<>();
+        String sql = "SELECT user_id, employee_id, username, password_hash, role, status, created_at FROM users";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                User u = mapRow(rs);
+                map.put(u.getEmployeeId(), u);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return map;
+    }
 
     public User findByUsername(String username) {
         String sql = "SELECT user_id, employee_id, username, password_hash, role, status, created_at "

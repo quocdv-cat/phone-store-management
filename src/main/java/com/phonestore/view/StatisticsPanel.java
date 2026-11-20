@@ -5,6 +5,7 @@ import com.phonestore.model.dto.DashboardSummaryDTO;
 import com.phonestore.model.dto.RevenueStatDTO;
 import com.phonestore.model.dto.TopProductDTO;
 import com.phonestore.service.StatisticsService;
+import com.phonestore.utils.CsvExportUtils;
 import com.phonestore.utils.CurrencyUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -95,18 +96,29 @@ public class StatisticsPanel extends JPanel {
         JPanel topContainer = new JPanel(new BorderLayout(10, 10));
 
         JPanel headerBar = new JPanel(new BorderLayout());
-        JLabel lblTitle = new JLabel("DASHBOARD THỐNG KÊ & BÁO CÁO TỔNG HỢP");
+        JLabel lblTitle = new JLabel("THỐNG KÊ & BÁO CÁO DOANH THU");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(new Color(30, 41, 59));
 
-        JButton btnRefreshAll = new JButton("Làm mới Dashboard");
+        JPanel headerBtnGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        headerBtnGroup.setOpaque(false);
+
+        JButton btnExportExcel = new JButton("Xuất Excel");
+        btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExportExcel.setBackground(new Color(22, 163, 74));
+        btnExportExcel.setForeground(Color.WHITE);
+
+        JButton btnRefreshAll = new JButton("Làm mới");
         btnRefreshAll.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRefreshAll.setBackground(new Color(59, 130, 246));
         btnRefreshAll.setForeground(Color.WHITE);
         btnRefreshAll.addActionListener(e -> loadAllData());
 
+        headerBtnGroup.add(btnExportExcel);
+        headerBtnGroup.add(btnRefreshAll);
+
         headerBar.add(lblTitle, BorderLayout.WEST);
-        headerBar.add(btnRefreshAll, BorderLayout.EAST);
+        headerBar.add(headerBtnGroup, BorderLayout.EAST);
         topContainer.add(headerBar, BorderLayout.NORTH);
 
         // 4 Thẻ chỉ số
@@ -133,6 +145,17 @@ public class StatisticsPanel extends JPanel {
         tabbedPane.addTab("Thống kê Doanh thu & Lợi nhuận", createRevenueTab());
         tabbedPane.addTab("Top Sản phẩm Bán chạy", createTopProductsTab());
         tabbedPane.addTab("Cảnh báo Tồn kho thấp (<= 5)", createLowStockTab());
+
+        btnExportExcel.addActionListener(e -> {
+            int tabIdx = tabbedPane.getSelectedIndex();
+            if (tabIdx == 0) {
+                CsvExportUtils.exportTableToCsv(this, tblYearlyRevenue, "ThongKeDoanhThu");
+            } else if (tabIdx == 1) {
+                CsvExportUtils.exportTableToCsv(this, tblTopProducts, "TopSanPhamBanChay");
+            } else {
+                CsvExportUtils.exportTableToCsv(this, tblLowStock, "CanhBaoTonKhoThap");
+            }
+        });
 
         add(tabbedPane, BorderLayout.CENTER);
     }

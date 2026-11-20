@@ -346,8 +346,9 @@ public class EmployeePanel extends JPanel {
     private void loadEmployees(String keyword) {
         tableModel.setRowCount(0);
         currentEmployees = employeeService.searchEmployees(keyword);
+        java.util.Map<Integer, User> accountMap = employeeService.getAllAccountsMapByEmployeeId();
         for (Employee emp : currentEmployees) {
-            User acc = employeeService.getAccountByEmployeeId(emp.getEmployeeId());
+            User acc = accountMap.get(emp.getEmployeeId());
             tableModel.addRow(new Object[]{
                 emp.getEmployeeId(),
                 emp.getEmployeeCode(),

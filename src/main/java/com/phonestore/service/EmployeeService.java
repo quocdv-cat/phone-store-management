@@ -10,6 +10,7 @@ import com.phonestore.utils.PasswordUtils;
 import com.phonestore.utils.SessionManager;
 import com.phonestore.utils.ValidationUtils;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Xử lý nghiệp vụ CRUD Nhân viên, Quản lý Tài khoản đăng nhập
@@ -23,6 +24,10 @@ public class EmployeeService {
 
     public List<Employee> searchEmployees(String keyword) {
         return employeeDAO.search(keyword);
+    }
+
+    public Map<Integer, User> getAllAccountsMapByEmployeeId() {
+        return userDAO.findAllMapByEmployeeId();
     }
 
     public User getAccountByEmployeeId(int employeeId) {

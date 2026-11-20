@@ -106,7 +106,7 @@ public class SalesPanel extends JPanel {
 
         // Header Banner
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel lblHeader = new JLabel("PH\u00c2N H\u1ec6 B\u00c1N H\u00c0NG T\u1ea0I QU\u1ea6Y (POINT OF SALE - POS)");
+        JLabel lblHeader = new JLabel("QUẢN LÝ BÁN HÀNG TẠI QUẦY");
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblHeader.setForeground(new Color(30, 41, 59));
 

@@ -6,10 +6,12 @@ import com.phonestore.model.Product;
 import com.phonestore.service.BrandService;
 import com.phonestore.service.CategoryService;
 import com.phonestore.service.ProductService;
+import com.phonestore.utils.CsvExportUtils;
 import com.phonestore.utils.CurrencyUtils;
 import com.phonestore.utils.MessageUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -30,6 +32,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -69,10 +73,20 @@ public class ProductPanel extends JPanel {
     private JSpinner spnWarrantyMonths;
     private JComboBox<String> cbxFormStatus;
 
+    private JButton btnAdd;
+    private JButton btnUpdate;
+    private JButton btnDelete;
+
     public ProductPanel() {
         initComponents();
         reloadBrandAndCategoryCombos();
         loadProducts();
+    }
+
+    public void setEditAllowed(boolean allowed) {
+        if (btnAdd != null) btnAdd.setEnabled(allowed);
+        if (btnUpdate != null) btnUpdate.setEnabled(allowed);
+        if (btnDelete != null) btnDelete.setEnabled(allowed);
     }
 
     public void refreshData() {
@@ -149,8 +163,15 @@ public class ProductPanel extends JPanel {
 
         JPanel filterBtnGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         filterBtnGroup.setOpaque(false);
+        JButton btnExportExcel = new JButton("Xuất Excel");
+        btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnExportExcel.setBackground(new Color(22, 163, 74));
+        btnExportExcel.setForeground(Color.WHITE);
+        btnExportExcel.addActionListener(e -> CsvExportUtils.exportTableToCsv(this, tblProducts, "DanhSachDienThoai"));
+
         filterBtnGroup.add(btnFilter);
         filterBtnGroup.add(btnResetFilter);
+        filterBtnGroup.add(btnExportExcel);
 
         fgbc.gridx = 4; fgbc.gridwidth = 2; fgbc.weightx = 0.3;
         filterBar.add(filterBtnGroup, fgbc);
@@ -173,6 +194,36 @@ public class ProductPanel extends JPanel {
         tblProducts.setRowHeight(27);
         tblProducts.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tblProducts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Tô màu cảnh báo trực quan cho cột Tồn Kho (cột index 10)
+        tblProducts.getColumnModel().getColumn(10).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                int stock = 0;
+                if (value instanceof Number num) {
+                    stock = num.intValue();
+                } else if (value != null) {
+                    try {
+                        stock = Integer.parseInt(value.toString());
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                setFont(getFont().deriveFont(Font.BOLD));
+                if (!isSelected) {
+                    if (stock <= 0) {
+                        c.setForeground(new Color(220, 38, 38)); // Đỏ: Hết hàng
+                    } else if (stock <= 5) {
+                        c.setForeground(new Color(217, 119, 6)); // Cam: Sắp hết hàng (<= 5)
+                    } else {
+                        c.setForeground(new Color(22, 163, 74)); // Xanh lá: Đủ hàng
+                    }
+                }
+                return c;
+            }
+        });
+
         tblProducts.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblProducts.getSelectedRow() >= 0) {
                 populateFormFromSelectedRow(tblProducts.getSelectedRow());
@@ -223,19 +274,19 @@ public class ProductPanel extends JPanel {
         addFormField(form, gbc, 6, 2, "Trạng thái:", cbxFormStatus);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 4));
-        JButton btnAdd = new JButton("Thêm điện thoại");
+        btnAdd = new JButton("Thêm điện thoại");
         btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnAdd.setBackground(new Color(22, 163, 74));
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setPreferredSize(new Dimension(150, 36));
 
-        JButton btnUpdate = new JButton("Cập nhật");
+        btnUpdate = new JButton("Cập nhật");
         btnUpdate.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnUpdate.setBackground(new Color(37, 99, 235));
         btnUpdate.setForeground(Color.WHITE);
         btnUpdate.setPreferredSize(new Dimension(130, 36));
 
-        JButton btnDelete = new JButton("Xóa / Ngừng KD");
+        btnDelete = new JButton("Xóa / Ngừng KD");
         btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDelete.setBackground(new Color(220, 38, 38));
         btnDelete.setForeground(Color.WHITE);
