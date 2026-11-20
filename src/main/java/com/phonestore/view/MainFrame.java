@@ -23,8 +23,10 @@ import javax.swing.SwingConstants;
 
 /**
  * Cửa sổ Trang chủ sử dụng Sidebar có Icon trực quan + CardLayout.
- * Tích hợp đầy đủ các module của Thành viên 1 (Sản phẩm, Thương hiệu & Danh mục, Nhân viên & Tài khoản)
- * và Thành viên 3 (Nhập kho, Nhà cung cấp, Thống kê Doanh thu).
+ * Khung tích hợp hoàn chỉnh cả 9/9 Module của 3 thành viên:
+ * - Thành viên 1: Sản phẩm, Thương hiệu & Danh mục, Nhân viên & Tài khoản (+ Phân quyền Chức vụ).
+ * - Thành viên 2: Bán hàng POS, Quản lý Hóa đơn, Quản lý Khách hàng.
+ * - Thành viên 3: Quản lý Nhập kho, Nhà cung cấp, Thống kê Doanh thu.
  */
 public class MainFrame extends JFrame {
 
@@ -36,6 +38,11 @@ public class MainFrame extends JFrame {
     private ProductPanel productPanel;
     private CategoryBrandPanel categoryBrandPanel;
     private EmployeePanel employeePanel;
+
+    // Các Panel của Thành viên 2
+    private SalesPanel salesPanel;
+    private InvoicePanel invoicePanel;
+    private CustomerPanel customerPanel;
 
     // Các Panel của Thành viên 3
     private PurchasePanel purchasePanel;
@@ -73,8 +80,8 @@ public class MainFrame extends JFrame {
 
         User user = SessionManager.getCurrentUser();
         Employee emp = SessionManager.getCurrentEmployee();
-        String fullName = emp != null ? emp.getFullName() : (user != null ? user.getUsername() : "");
-        String position = emp != null ? emp.getPosition() : "";
+        String fullName = emp != null ? emp.getFullName() : (user != null ? user.getUsername() : "Quản trị viên");
+        String position = emp != null ? emp.getPosition() : "Quản trị hệ thống";
 
         JLabel lblBrand = new JLabel("<html><center>CỬA HÀNG ĐIỆN THOẠI<br>"
                 + "<font size='3' color='#38bdf8'>" + position + "</font><br>"
@@ -139,10 +146,14 @@ public class MainFrame extends JFrame {
         bottomAccountPanel.add(btnLogout);
         sidebar.add(bottomAccountPanel, BorderLayout.SOUTH);
 
-        // 2. CONTENT PANEL (CardLayout tích hợp TV1 & TV3)
+        // 2. CONTENT PANEL (CardLayout tích hợp trọn vẹn TV1 + TV2 + TV3)
         productPanel = new ProductPanel();
         categoryBrandPanel = new CategoryBrandPanel(() -> productPanel.refreshData());
         employeePanel = new EmployeePanel(this::applyPositionPermissions);
+
+        salesPanel = new SalesPanel();
+        invoicePanel = new InvoicePanel();
+        customerPanel = new CustomerPanel();
 
         purchasePanel = new PurchasePanel();
         supplierPanel = new SupplierPanel();
@@ -150,9 +161,9 @@ public class MainFrame extends JFrame {
 
         contentPanel.add(productPanel, "PRODUCTS");
         contentPanel.add(categoryBrandPanel, "CAT_BRAND");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ BÁN HÀNG"), "SALES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ HÓA ĐƠN"), "INVOICES");
-        contentPanel.add(createPlaceholderPanel("PHÂN HỆ QUẢN LÝ KHÁCH HÀNG"), "CUSTOMERS");
+        contentPanel.add(salesPanel, "SALES");
+        contentPanel.add(invoicePanel, "INVOICES");
+        contentPanel.add(customerPanel, "CUSTOMERS");
         contentPanel.add(purchasePanel, "PURCHASE");
         contentPanel.add(supplierPanel, "SUPPLIERS");
         contentPanel.add(employeePanel, "EMPLOYEES");
@@ -166,9 +177,18 @@ public class MainFrame extends JFrame {
             categoryBrandPanel.refreshData();
             cardLayout.show(contentPanel, "CAT_BRAND");
         });
-        btnSales.addActionListener(e -> cardLayout.show(contentPanel, "SALES"));
-        btnInvoices.addActionListener(e -> cardLayout.show(contentPanel, "INVOICES"));
-        btnCustomers.addActionListener(e -> cardLayout.show(contentPanel, "CUSTOMERS"));
+        btnSales.addActionListener(e -> {
+            salesPanel.loadAvailableProducts("");
+            cardLayout.show(contentPanel, "SALES");
+        });
+        btnInvoices.addActionListener(e -> {
+            invoicePanel.loadInvoices();
+            cardLayout.show(contentPanel, "INVOICES");
+        });
+        btnCustomers.addActionListener(e -> {
+            customerPanel.loadCustomers("");
+            cardLayout.show(contentPanel, "CUSTOMERS");
+        });
         btnPurchase.addActionListener(e -> {
             purchasePanel.reloadSuppliersAndProducts();
             cardLayout.show(contentPanel, "PURCHASE");
@@ -227,14 +247,5 @@ public class MainFrame extends JFrame {
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
         return btn;
-    }
-
-    private JPanel createPlaceholderPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(title, SwingConstants.CENTER);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        label.setForeground(new Color(100, 116, 139));
-        panel.add(label, BorderLayout.CENTER);
-        return panel;
     }
 }

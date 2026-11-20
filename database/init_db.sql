@@ -207,7 +207,6 @@ INSERT INTO products (product_code, product_name, brand_id, category_id, model, 
 ('SP008', 'OPPO Reno12 5G', 4, 2, 'CPH2625', '12GB', '256GB', 'Bạc Vũ Trụ', 9800000, 11990000, 8, 12);
 
 INSERT INTO customers (full_name, phone, email, address) VALUES
-('Khách vãng lai', '0000000000', '', 'Mua trực tiếp tại cửa hàng'),
 ('Phạm Minh Tuấn', '0912345678', 'tuanpm@gmail.com', '123 Nguyễn Huệ, Q.1, TP.HCM'),
 ('Hoàng Thu Trang', '0987654321', 'tranght@gmail.com', '45 Lê Lợi, Q.1, TP.HCM'),
 ('Đỗ Đức Anh', '0933445566', 'anhdd@gmail.com', '88 Võ Văn Ngân, TP.Thủ Đức');
@@ -226,8 +225,8 @@ INSERT INTO purchase_details (purchase_id, product_id, quantity, import_price, s
 (2, 3, 5, 24000000, 120000000);
 
 INSERT INTO invoices (invoice_code, customer_id, employee_id, invoice_date, total_amount, discount_amount, final_amount, note) VALUES
-('HD20261101-001', 2, 2, '2026-11-01 10:15:00', 33990000, 490000, 33500000, 'Tặng kèm ốp lưng'),
-('HD20261102-001', 3, 2, '2026-11-02 16:40:00', 37480000, 0, 37480000, 'Khách thanh toán chuyển khoản');
+('HD20261101-001', 1, 2, '2026-11-01 10:15:00', 33990000, 490000, 33500000, 'Tặng kèm ốp lưng'),
+('HD20261102-001', 2, 2, '2026-11-02 16:40:00', 37480000, 0, 37480000, 'Khách thanh toán chuyển khoản');
 
 INSERT INTO invoice_details (invoice_id, product_id, quantity, unit_price, subtotal) VALUES
 (1, 1, 1, 33990000, 33990000),
