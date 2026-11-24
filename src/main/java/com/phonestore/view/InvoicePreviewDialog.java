@@ -175,8 +175,8 @@ public class InvoicePreviewDialog extends JDialog {
         // Header
         sb.append("<div class='header'>");
         sb.append("<div class='store-name'>MOBILE STORE - CỬA HÀNG ĐIỆN THOẠI CHÍNH HÃNG</div>");
-        sb.append("<div class='store-info'>Địa chỉ: 123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh | Hotline: 1900 6868</div>");
-        sb.append("<div class='store-info'>Website: www.phonestore.vn - Email: support@phonestore.vn</div>");
+        sb.append("<div class='store-info'>Địa chỉ: 235 Hoàng Quốc Việt, Phường Nghĩa Đô, Hà Nội | Hotline: 1900 6868</div>");
+        sb.append("<div class='store-info'>Website: www.phonestorettq.vn - Email: support@phonestorettq.vn</div>");
         sb.append("</div>");
 
         sb.append("<div class='title'>HÓA ĐƠN BÁN HÀNG</div>");
@@ -256,8 +256,9 @@ public class InvoicePreviewDialog extends JDialog {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("=================================================================\n");
-        sb.append("               MOBILE STORE - CUA HANG DIEN THOAI                \n");
-        sb.append("          123 Nguyen Hue, Q.1, TP.HCM - Hotline: 1900 6868       \n");
+        sb.append("               MOBILE STORE - CỬA HÀNG ĐIỆN THOẠI                \n");
+        sb.append("      Địa chỉ: 235 Hoàng Quốc Việt, Phường Nghĩa Đô, Hà Nội      \n");
+        sb.append("         Website: www.phonestorettq.vn - Hotline: 1900 6868      \n");
         sb.append("=================================================================\n");
         sb.append("                       HOA DON BAN HANG                          \n");
         sb.append("Ma hoa don : ").append(invoice.getInvoiceCode()).append("\n");
